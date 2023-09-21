@@ -383,16 +383,21 @@ const Home = () => {
       //get gas limit
       console.log("wallet: ", wallet);
       //@ts-ignore @TODO detect context
-      const isMetaMask = await wallet?._isMetaMask;
+      // const isMetaMask = await wallet?._isMetaMask;
+      let isMetaMask = false
+      // @ts-ignore
+      if (wallet[0].type === "metamask") isMetaMask = true;
+      console.log("wallet: ", wallet);
+      console.log("isMetaMask: ", isMetaMask);
       let responseSign;
       if (isMetaMask) {
         // @ts-ignore
-        responseSign = await wallet.ethSendTx(input);
+        responseSign = await wallet[0].wallet.ethSendTx(input);
         console.log("responseSign: ", responseSign);
         setTxid(responseSign.hash);
       } else {
         // @ts-ignore
-        responseSign = await wallet.ethSignTx(input);
+        responseSign = await wallet[0].wallet.ethSignTx(input);
         console.log("responseSign: ", responseSign);
       }
       console.log("responseSign: ", responseSign);
