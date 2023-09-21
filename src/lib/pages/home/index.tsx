@@ -386,10 +386,12 @@ const Home = () => {
       const isMetaMask = await wallet?._isMetaMask;
       let responseSign;
       if (isMetaMask) {
+        // @ts-ignore
         responseSign = await wallet.ethSendTx(input);
         console.log("responseSign: ", responseSign);
         setTxid(responseSign.hash);
       } else {
+        // @ts-ignore
         responseSign = await wallet.ethSignTx(input);
         console.log("responseSign: ", responseSign);
       }
