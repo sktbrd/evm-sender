@@ -9,6 +9,7 @@ import {
   Text,
   VStack,
   Grid,
+  Spinner,
   Modal,
   Button,
   ModalOverlay,
@@ -19,7 +20,6 @@ import {
   ModalCloseButton,
   useDisclosure,
   Image,
-  Spinner,
   Tabs,
   TabList,
   TabPanels,
@@ -30,7 +30,7 @@ import React, { useEffect, useState } from "react";
 import { Logo } from "./components/Logo";
 import { NFT_ABI } from "./components/NFTAbi";
 // @ts-ignore
-import { usePioneer } from "pioneer-react";
+import { usePioneer } from "@pioneer-platform/pioneer-react";
 import Web3 from "web3";
 
 // @ts-ignore
@@ -41,24 +41,89 @@ import METAMASK_ICON from "lib/assets/png/metamask.png";
 import PIONEER_ICON from "lib/assets/png/pioneer.png";
 
 const ALL_CHAINS = [
-  { name: "ethereum", chain_id: 1, symbol: "ETH" },
-  { name: "polygon", chain_id: 137, symbol: "MATIC" },
-  { name: "pulsechain", chain_id: 369, symbol: "PLS" },
-  { name: "optimism", chain_id: 10, symbol: "ETH" },
-  { name: "gnosis", chain_id: 100, symbol: "xDAI" },
-  { name: "binance-smart-chain", chain_id: 56, symbol: "BNB" },
-  { name: "smart-bitcoin-cash", chain_id: 10000, symbol: "BCH" },
-  { name: "dogechain", chain_id: 2000, symbol: "DOGE" },
-  // { name: "arbitrum", chain_id: 42161, symbol: "ARB" }, //TODO push node
-  { name: "fuse", chain_id: 122, symbol: "FUSE" },
-  // { name: "bittorrent", chain_id: 199, symbol: "BTT" },//TODO push node
-  { name: "celo", chain_id: 42220, symbol: "CELO" },
-  { name: "avalanche-c-chain", chain_id: 43114, symbol: "AVAX" },
-  // { name: "görli", chain_id: 5, symbol: "GOR" },
-  { name: "eos", chain_id: 59, symbol: "EOS" },
-  // { name: "ethereum-classic", chain_id: 61, symbol: "ETC" }, //TODO push node
-  { name: "evmos", chain_id: 9001, symbol: "EVMOS" },
-  // { name: "poa-core", chain_id: 99, symbol: "POA" }, //TODO push node
+  {
+    name: "ethereum",
+    chain_id: 1,
+    symbol: "ETH",
+    image: "https://pioneers.dev/coins/ethereum.png",
+  },
+  {
+    name: "polygon",
+    chain_id: 137,
+    symbol: "MATIC",
+    image: "https://pioneers.dev/coins/polygon.png",
+  },
+  {
+    name: "pulsechain",
+    chain_id: 369,
+    symbol: "PLS",
+    image: "https://pioneers.dev/coins/pulsechain.png",
+  },
+  {
+    name: "optimism",
+    chain_id: 10,
+    symbol: "ETH",
+    image: "https://pioneers.dev/coins/optimism.png",
+  },
+  {
+    name: "gnosis",
+    chain_id: 100,
+    symbol: "xDAI",
+    image: "https://pioneers.dev/coins/gnosis.png",
+  },
+  {
+    name: "binance-smart-chain",
+    chain_id: 56,
+    symbol: "BNB",
+    image: "https://pioneers.dev/coins/binance-smart-chain.png",
+  },
+  {
+    name: "smart-bitcoin-cash",
+    chain_id: 10000,
+    symbol: "BCH",
+    image: "https://pioneers.dev/coins/smart-bitcoin-cash.png",
+  },
+  {
+    name: "dogechain",
+    chain_id: 2000,
+    symbol: "DOGE",
+    image: "https://pioneers.dev/coins/dogecoin.png",
+  },
+  // { name: "arbitrum", chain_id: 42161, symbol: "ARB", image: "https://pioneers.dev/coins/arbitrum.png" }, //TODO push node
+  {
+    name: "fuse",
+    chain_id: 122,
+    symbol: "FUSE",
+    image: "https://pioneers.dev/coins/fuse.png",
+  },
+  // { name: "bittorrent", chain_id: 199, symbol: "BTT", image: "https://pioneers.dev/coins/bittorrent.png" },//TODO push node
+  {
+    name: "celo",
+    chain_id: 42220,
+    symbol: "CELO",
+    image: "https://pioneers.dev/coins/celo.png",
+  },
+  {
+    name: "avalanche-c-chain",
+    chain_id: 43114,
+    symbol: "AVAX",
+    image: "https://pioneers.dev/coins/avalanche-c-chain.png",
+  },
+  // { name: "görli", chain_id: 5, symbol: "GOR", image: "https://pioneers.dev/coins/görli.png" },
+  {
+    name: "eos",
+    chain_id: 59,
+    symbol: "EOS",
+    image: "https://pioneers.dev/coins/eos.png",
+  },
+  // { name: "ethereum-classic", chain_id: 61, symbol: "ETC", image: "https://pioneers.dev/coins/ethereum-classic.png" }, //TODO push node
+  {
+    name: "evmos",
+    chain_id: 9001,
+    symbol: "EVMOS",
+    image: "https://pioneers.dev/coins/evmos.png",
+  },
+  // { name: "poa-core", chain_id: 99, symbol: "POA", image: "https://pioneers.dev/coins/poa-core.png" }, //TODO push node
 ];
 
 interface WalletOption {
@@ -68,8 +133,10 @@ interface WalletOption {
 
 const Home = () => {
   const { state } = usePioneer();
-  const { api, wallet, app } = state;
+  const { api, app, context, assetContext, blockchainContext, pubkeyContext } =
+    state;
   const [address, setAddress] = useState("");
+  const [wallet, setWallet] = useState([]);
   const [walletOptions, setWalletOptions] = useState([]);
   const [balance, setBalance] = useState("0.000");
   const [tokenBalance, setTokenBalance] = useState("0.000");
@@ -87,7 +154,7 @@ const Home = () => {
   const [assets, setAssets] = useState("");
   const [blockchain, setBlockchain] = useState("");
   const [chainId, setChainId] = useState(1);
-  const [web3, setWeb3] = useState("");
+  const [web3, setWeb3] = useState(null);
   const [toAddress, setToAddress] = useState("");
   const [txid, setTxid] = useState(null);
   const [signedTx, setSignedTx] = useState(null);
@@ -98,6 +165,11 @@ const Home = () => {
   const [data, setData] = useState(() => []);
   const [query, setQuery] = useState("bitcoin...");
   const [timeOut, setTimeOut] = useState(null);
+
+  useEffect(() => {
+    console.log("pubkeyContext: ", pubkeyContext);
+    setAddress(pubkeyContext.master || pubkeyContext.pubkey || "");
+  }, [pubkeyContext]);
 
   const onSend = async function () {
     try {
@@ -354,80 +426,48 @@ const Home = () => {
 
   const onStart = async function () {
     try {
-      //get wallets
-      console.log("app: ", app);
-      console.log("onStart context: ", app.context);
-      console.log("onStart wallets: ", app.wallets);
-      console.log("onStart walletDescriptions: ", app);
-      console.log("onStart walletDescriptions: ", app.user);
-      console.log("onStart walletDescriptions: ", app.user.walletDescriptions);
-      // console.log("walletDescriptions: ", app.walletDescriptions.length);
-      if (app.user.walletDescriptions) {
-        const walletOptions: any = [];
-        for (let i = 0; i < app.user.walletDescriptions.length; i++) {
-          const walletDescription = app.user.walletDescriptions[i];
-          console.log("wallet: ", walletDescription);
-          const walletOption: any = {
-            context: walletDescription.context,
-          };
-          if (walletDescription.type === "keepkey") {
-            walletOption.icon = KEEPKEY_ICON;
-          }
-          if (walletDescription.type === "metamask") {
-            walletOption.icon = METAMASK_ICON;
-          }
-          if (walletDescription.type === "native") {
-            walletOption.icon = PIONEER_ICON;
-          }
-          walletOptions.push(walletOption);
+      if (address) {
+        console.log(app);
+        setWallet(
+          app.wallets.filter((wallet: any) => wallet.context === app.context)
+        );
+        console.log(wallet);
+        //get wallets
+        console.log("app: ", app);
+        console.log("onStart context: ", app.context);
+        console.log("onStart wallets: ", app.wallets);
+        console.log("onStart walletDescriptions: ", app);
+        console.log("onStart walletDescriptions: ", app.user);
+        // console.log("walletDescriptions: ", app.walletDescriptions.length);
+
+        const info = await api.SearchByNetworkId({ chainId: 1 });
+        console.log("onStart: info: ", info.data[0]);
+        if (!info.data[0]) {
+          console.error("No network found!");
         }
-        console.log("walletOptions: ", walletOptions);
-        setWalletOptions(walletOptions);
-      }
-
-      const addressInfo = {
-        addressNList: [2147483692, 2147483708, 2147483648, 0, 0],
-        coin: "Ethereum",
-        scriptType: "ethereum",
-        showDisplay: false,
-      };
-      console.log(wallet);
-      const address = await wallet.ethGetAddress(addressInfo);
-      console.log("address: ", address);
-      setAddress(address);
-
-      const info = await api.SearchByNetworkId({ chainId: 1 });
-      console.log("onStart: info: ", info.data[0]);
-      if (!info.data[0]) {
-        console.error("No network found!");
-      }
-      setIcon(info.data[0].image);
-      setService(info.data[0].service);
-      setChainId(info.data[0].chainId);
-      setBlockchain(info.data[0].name);
-      // @ts-ignore
-      const web3 = new Web3(
+        setService(info.data[0].service);
+        setChainId(info.data[0].chainId);
+        setBlockchain(info.data[0].name);
         // @ts-ignore
-        new Web3.providers.HttpProvider(info.data[0].service)
-      );
-      // @ts-ignore
-      setWeb3(web3);
-      // Get the current block number
-      const blockNumber = await web3.eth.getBlockNumber();
-      // Get the block information using the block number
-      const blockData = await web3.eth.getBlock(blockNumber);
+        const web3 = new Web3(
+          // @ts-ignore
+          new Web3.providers.HttpProvider(info.data[0].service)
+        );
+        // @ts-ignore
+        setWeb3(web3);
+        //Get the current block number
+        const blockNumber = await web3.eth.getBlockNumber();
+        console.log("blockNumber: ", blockNumber);
+        const balanceResult = await web3.eth.getBalance(address, blockNumber);
+        console.log("balanceResult: ", balanceResult);
+        const balanceInEther = web3.utils.fromWei(balanceResult, "ether");
+        setBalance(balanceInEther);
+        // Now you can use the balanceInEther and blockNumber as needed
+        console.log("Balance in Ether: ", balanceInEther);
+        console.log("Block Number: ", blockNumber);
 
-      const timestamp = blockData.timestamp;
-
-      // Get the account balance at that specific block using the timestamp
-      const balanceResult = await web3.eth.getBalance(address, timestamp);
-      const balanceInEther = web3.utils.fromWei(balanceResult, "ether");
-      setBalance(balanceInEther);
-      // Now you can use the balanceInEther and blockNumber as needed
-      console.log("Balance in Ether: ", balanceInEther);
-      console.log("Block Number: ", blockNumber);
-
-      //TODO get tokens for chain
+        //TODO get tokens for chain
+      }
     } catch (e) {
       console.error(e);
     }
@@ -435,7 +475,7 @@ const Home = () => {
 
   useEffect(() => {
     onStart();
-  }, [api, app, app?.walletDescriptions]);
+  }, [api, app, app?.walletDescriptions, address]);
 
   const handleClose = async function () {
     try {
@@ -559,59 +599,40 @@ const Home = () => {
   const handleSelect = async function (input: any) {
     try {
       console.log("handleSelect input: ", input.target.value);
-
+      let selection: any = ALL_CHAINS.filter(
+        (chain) => chain.name === input.target.value
+      );
+      console.log("handleSelect: ", selection);
+      selection = selection[0];
       //get provider info
-      const info = await api.SearchByNetworkName({
-        blockchain: input.target.value,
-      });
-      console.log("handleSelect: ", info.data[0]);
+      const caip = "eip155:" + selection.chain_id + "/slip44:60";
+      console.log("caip: ", caip);
+      const info = await api.NodesByCaip({ caip });
+      console.log("info: ", info);
       console.log("handleSelect: chainId: ", info.data[0].chainId);
-      setIcon(info.data[0].image);
+      setIcon(selection.image);
       setService(info.data[0].service);
       setChainId(info.data[0].chainId);
       setBlockchain(info.data[0].name);
       // @ts-ignore
-      const web3 = new Web3(
+      console.log("web3 service provder: ", info.data[0].service);
+      const web3New = new Web3(
         new Web3.providers.HttpProvider(info.data[0].service)
       );
       // @ts-ignore
-      setWeb3(web3);
-
-      //if balance > 0 show send modal
-      const blockNumber = await web3.eth.getBlockNumber();
-      console.log("blockNumber: ", blockNumber);
-
-      // Get the block information using the block number
-      const blockData = await web3.eth.getBlock(blockNumber);
-
-      const timestamp = blockData.timestamp;
-
-      // Get the account balance at that specific block using the timestamp
-      const balanceResult = await web3.eth.getBalance(address, timestamp);
-      const balanceInEther = web3.utils.fromWei(balanceResult, "ether");
-      setBalance(balanceInEther);
-      // Now you can use the balanceInEther and blockNumber as needed
-      console.log("Balance in Ether: ", balanceInEther);
-      console.log("Block Number: ", blockNumber);
-
-      // const blockNumber = await web3.eth.getBlockNumber();
-      // console.log("blockNumber: ", blockNumber);
-      // // @ts-ignore
-      // web3.eth.getBalance(
-      //   address,
-      //   blockNumber,
-      //   // @ts-ignore
-      //   function (err: any, result: any) {
-      //     if (err) {
-      //       //console.log(err)
-      //     } else {
-      //       console.log(web3.utils.fromWei(result, "ether") + " ETH")
-      //       setBalance(
-      //         web3.utils.fromWei(result, "ether") + " " + info.data[0].symbol
-      //       );
-      //     }
-      //   }
-      // );
+      setWeb3(web3New);
+      if (web3New) {
+        //Get the current block number
+        const blockNumber = await web3New.eth.getBlockNumber();
+        console.log("blockNumber: ", blockNumber);
+        const balanceResult = await web3New.eth.getBalance(
+          address,
+          blockNumber
+        );
+        console.log("balanceResult: ", balanceResult);
+        const balanceInEther = web3New.utils.fromWei(balanceResult, "ether");
+        setBalance(balanceInEther);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -811,42 +832,53 @@ const Home = () => {
           )}
         </ModalContent>
       </Modal>
-      <Box textAlign="center" fontSize="xl">
-        <Grid minH="100vh" p={3}>
-          <VStack spacing={8}>
-            <Logo h="40vmin" pointerEvents="none" logo={icon} />
-            <Grid templateRows="1fr 1fr 1fr" gap="1rem" alignItems="center">
-              <Box p="1rem" border="1px" borderColor="gray.300">
-                <Text fontSize="xl" fontWeight="bold">
-                  Selected: {blockchain} (chainId{chainId})
-                </Text>
-                <Select
-                  placeholder={`selected: ${blockchain}`}
-                  defaultValue="ethereum"
-                  onChange={handleSelect}
-                >
-                  {ALL_CHAINS.map((blockchain) => (
-                    <option value={blockchain.name}>
-                      {blockchain.name} ({blockchain.symbol})
-                    </option>
-                  ))}
-                </Select>
-              </Box>
-              <Box p="1rem" border="1px" borderColor="gray.300">
-                <Text>address: {address}</Text>
-              </Box>
-              <Box p="1rem" border="1px" borderColor="gray.300">
-                <Text>balance: {balance}</Text>
-              </Box>
-              <Box p="1rem" border="1px" borderColor="gray.300">
-                <Button colorScheme="green" onClick={onOpen}>
-                  Send
-                </Button>
-              </Box>
-            </Grid>
-          </VStack>
-        </Grid>
-      </Box>
+      {address ? (
+        <Box textAlign="center" fontSize="xl">
+          <Grid minH="100vh" p={3}>
+            <VStack spacing={8}>
+              <Logo h="40vmin" pointerEvents="none" logo={icon} />
+              <Grid templateRows="1fr 1fr 1fr" gap="1rem" alignItems="center">
+                <Box p="1rem" border="1px" borderColor="gray.300">
+                  <Text fontSize="xl" fontWeight="bold">
+                    Selected: {blockchain} (chainId{chainId})
+                  </Text>
+                  <Select
+                    placeholder={`selected: ${blockchain}`}
+                    defaultValue="ethereum"
+                    onChange={handleSelect}
+                  >
+                    {ALL_CHAINS.map((blockchain) => (
+                      <option value={blockchain.name}>
+                        {blockchain.name} ({blockchain.symbol})
+                      </option>
+                    ))}
+                  </Select>
+                </Box>
+                <Box p="1rem" border="1px" borderColor="gray.300">
+                  <Text>address: {address}</Text>
+                </Box>
+                <Box p="1rem" border="1px" borderColor="gray.300">
+                  <Text>balance: {balance}</Text>
+                </Box>
+                <Box p="1rem" border="1px" borderColor="gray.300">
+                  <Button colorScheme="green" onClick={onOpen}>
+                    Send
+                  </Button>
+                </Box>
+              </Grid>
+            </VStack>
+          </Grid>
+        </Box>
+      ) : (
+        // Spinner to show while loading address
+        <Spinner
+          size="xl"
+          thickness="4px"
+          speed="0.65s"
+          emptyColor="gray.200"
+          color="green.500"
+        />
+      )}
     </div>
   );
 };
