@@ -563,12 +563,17 @@ const Home = () => {
             type: "function",
           },
         ];
+        console.log("inputValue: ", inputValue);
         // @ts-ignore
         const newContract = new web3.eth.Contract(minABI, inputValue);
+        console.log("newContract: ", newContract);
+        console.log("newContract: ", newContract.methods);
         const decimals = await newContract.methods.decimals().call();
+        console.log("decimals: ", decimals);
         setPrescision(decimals);
+        console.log("address: ", address);
         const balanceBN = await newContract.methods.balanceOf(address).call();
-        //console.log("input: balanceBN: ",balanceBN)
+        console.log("input: balanceBN: ",balanceBN)
         // @ts-ignore
         const tokenBalance = parseInt(balanceBN / Math.pow(10, decimals));
         if (tokenBalance > 0) {
