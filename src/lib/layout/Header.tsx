@@ -4,7 +4,7 @@ import { Box, Flex, HStack, Text, Avatar } from "@chakra-ui/react";
 import { Pioneer } from "@pioneer-platform/pioneer-react";
 import { Link as RouterLink } from "react-router-dom";
 
-const PROJECT_NAME = "EVM sender";
+const PROJECT_NAME = "EVM Sender";
 const AVATAR_IMAGE_URL = "https://media1.giphy.com/media/DdpmhAQpQZzwHSrQ3f/giphy.gif?cid=6c09b952vneyy8vy6b2872fj5o2ygsg7bfk43zcj92buqzml&ep=v1_stickers_related&rid=giphy.gif&ct=s"; // Replace with your actual avatar image URL
 
 const HeaderNew = () => {

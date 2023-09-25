@@ -37,6 +37,7 @@ import Web3 from "web3";
 import { CopyToClipboard } from "react-copy-to-clipboard"; // Import the library for copying to clipboard
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
 // @ts-ignore
 import KEEPKEY_ICON from "lib/assets/png/keepkey.png";
@@ -925,6 +926,13 @@ const Home = () => {
   >
     Send
   </Button>
+  <FontAwesomeIcon
+  icon={faGithub}
+  size="2x" // You can adjust the size value as needed
+  onClick={() => window.open("https://github.com/sktbrd/evm-sender", "_blank")}
+  style={{ color: "black", cursor: "pointer", position: "fixed", bottom: "20px", right: "20px" }}
+/>
+
 </Box>
 
               </Grid>
