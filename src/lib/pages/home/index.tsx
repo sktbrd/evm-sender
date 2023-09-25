@@ -25,13 +25,17 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Input,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import { Logo } from "./components/Logo";
 import { NFT_ABI } from "./components/NFTAbi";
 // @ts-ignore
 import { usePioneer } from "@pioneer-platform/pioneer-react";
 import Web3 from "web3";
+import { CopyToClipboard } from "react-copy-to-clipboard"; // Import the library for copying to clipboard
+import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // @ts-ignore
 import KEEPKEY_ICON from "lib/assets/png/keepkey.png";
@@ -42,86 +46,86 @@ import PIONEER_ICON from "lib/assets/png/pioneer.png";
 
 const ALL_CHAINS = [
   {
-    name: "ethereum",
+    name: "Ethereum",
     chain_id: 1,
     symbol: "ETH",
     image: "https://pioneers.dev/coins/ethereum.png",
   },
   {
-    name: "polygon",
+    name: "Polygon",
     chain_id: 137,
     symbol: "MATIC",
-    image: "https://pioneers.dev/coins/polygon.png",
+    image: "https://s3.coinmarketcap.com/static-gravity/image/b8db9a2ac5004c1685a39728cdf4e100.png",
   },
   {
-    name: "pulsechain",
+    name: "Pulsechain",
     chain_id: 369,
     symbol: "PLS",
-    image: "https://pioneers.dev/coins/pulsechain.png",
+    image: "https://upload.wikimedia.org/wikipedia/commons/a/a6/HEX_Logo.png",
   },
   {
-    name: "optimism",
+    name: "Optimism",
     chain_id: 10,
     symbol: "ETH",
-    image: "https://pioneers.dev/coins/optimism.png",
+    image: "https://cryptologos.cc/logos/optimism-ethereum-op-logo.png",
   },
   {
-    name: "gnosis",
+    name: "Gnosis",
     chain_id: 100,
     symbol: "xDAI",
-    image: "https://pioneers.dev/coins/gnosis.png",
+    image: "https://cdn.sanity.io/images/r2mka0oi/production/bf37b9c7fb36c7d3c96d3d05b45c76d89072b777-1800x1800.png",
   },
   {
-    name: "binance-smart-chain",
+    name: "Binance Smart Chain",
     chain_id: 56,
     symbol: "BNB",
-    image: "https://pioneers.dev/coins/binance-smart-chain.png",
+    image: "https://i.ibb.co/BBRMFTd/image.png",
   },
   {
-    name: "smart-bitcoin-cash",
+    name: "Smart BCH",
     chain_id: 10000,
     symbol: "BCH",
-    image: "https://pioneers.dev/coins/smart-bitcoin-cash.png",
+    image: "https://oss-us-cdn.maiziqianbao.net/Chain_logo/PU1641783052.jpg",
   },
   {
-    name: "dogechain",
+    name: "Doge Chain EVM",
     chain_id: 2000,
     symbol: "DOGE",
-    image: "https://pioneers.dev/coins/dogecoin.png",
+    image: "https://media.tenor.com/7wA-N7uaDVcAAAAj/zan-rui-zhanrui.gif",
   },
   // { name: "arbitrum", chain_id: 42161, symbol: "ARB", image: "https://pioneers.dev/coins/arbitrum.png" }, //TODO push node
   {
-    name: "fuse",
+    name: "Fuse",
     chain_id: 122,
     symbol: "FUSE",
-    image: "https://pioneers.dev/coins/fuse.png",
+    image: "https://avatars.githubusercontent.com/u/53186165?s=280&v=4",
   },
   // { name: "bittorrent", chain_id: 199, symbol: "BTT", image: "https://pioneers.dev/coins/bittorrent.png" },//TODO push node
   {
-    name: "celo",
+    name: "Celo",
     chain_id: 42220,
     symbol: "CELO",
-    image: "https://pioneers.dev/coins/celo.png",
+    image: "https://cryptologos.cc/logos/celo-celo-logo.png",
   },
   {
-    name: "avalanche-c-chain",
+    name: "Avalanche",
     chain_id: 43114,
     symbol: "AVAX",
-    image: "https://pioneers.dev/coins/avalanche-c-chain.png",
+    image: "https://cryptologos.cc/logos/avalanche-avax-logo.png",
   },
   // { name: "görli", chain_id: 5, symbol: "GOR", image: "https://pioneers.dev/coins/görli.png" },
   {
-    name: "eos",
+    name: "Eos",
     chain_id: 59,
     symbol: "EOS",
-    image: "https://pioneers.dev/coins/eos.png",
+    image: "https://cryptologos.cc/logos/eos-eos-logo.png",
   },
   // { name: "ethereum-classic", chain_id: 61, symbol: "ETC", image: "https://pioneers.dev/coins/ethereum-classic.png" }, //TODO push node
   {
-    name: "evmos",
+    name: "Evmos",
     chain_id: 9001,
     symbol: "EVMOS",
-    image: "https://pioneers.dev/coins/evmos.png",
+    image: "https://s101-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/114/810/original/Evmos_Token_Orange_RGB.jpeg?1657101087",
   },
   // { name: "poa-core", chain_id: 99, symbol: "POA", image: "https://pioneers.dev/coins/poa-core.png" }, //TODO push node
 ];
@@ -538,7 +542,10 @@ const Home = () => {
     const inputValue = e.target.value;
     setToAddress(inputValue);
   };
-
+  const handleAddressClick = () => {
+    // Handle the address click event here
+    alert("Address copied to clipboard");
+  };
   const handleInputChangeContract = async function (input: any) {
     try {
       const inputValue = input.target.value;
@@ -661,35 +668,37 @@ const Home = () => {
     <div>
       <Modal isOpen={isOpen} onClose={() => handleClose()} size="xl">
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Broadcasting to {blockchain}</ModalHeader>
+        <ModalContent
+  style={{
+    border: "1px solid black",
+    background: "linear-gradient(to bottom, black, white)",
+  }}
+>          <ModalHeader>Broadcasting to {blockchain}</ModalHeader>
           <ModalCloseButton />
           {loading ? (
             <div>
               <div>
                 <h2>Broadcasted! waiting on confirmation!</h2>
               </div>
-              <Spinner size="xl" color="green.500" />
+              <Spinner size="xl" color="green.500" > Click Connect Button</Spinner>
             </div>
           ) : (
             <div>
               <ModalBody>
-                <Tabs>
-                  <TabList>
+                <Tabs >
+                  <TabList >
                     <Tab>Native</Tab>
                     <Tab onClick={() => handleClickTabs("Token")}>Token</Tab>
                     <Tab onClick={() => handleClickTabs("NFT")}>NFT</Tab>
                   </TabList>
                   <TabPanels>
                     <TabPanel>
-                      <div>
-                        Context: <small>{app?.user?.context || ""}</small>
-                      </div>
-                      <div>balance: {balance}</div>
+                      <div>Balance: {balance}</div>
                       <br />
                       <div>
-                        amount:{" "}
-                        <input
+                        Amount:{" "}
+                        <Input border="1px solid black"
+                          
                           type="text"
                           name="amount"
                           value={amount}
@@ -698,8 +707,9 @@ const Home = () => {
                       </div>
                       <br />
                       <div>
-                        address:{" "}
-                        <input
+                        Address:{" "}
+                        <Input border="1px solid black"
+                          
                           type="text"
                           name="address"
                           value={toAddress}
@@ -710,8 +720,8 @@ const Home = () => {
                     </TabPanel>
                     <TabPanel>
                       <div>
-                        contract:{" "}
-                        <input
+                        Contract:{" "}
+<Input border="1px solid black"
                           type="text"
                           name="contract"
                           value={contract}
@@ -719,12 +729,12 @@ const Home = () => {
                         />
                       </div>
                       {tokenBalance ? (
-                        <div>tokenBalance: {tokenBalance}</div>
+                        <div>Token Balance: {tokenBalance}</div>
                       ) : (
-                        <div>no token balance</div>
+                        <div>No token balance</div>
                       )}
                       {prescision ? (
-                        <div>precision: {prescision}</div>
+                        <div>Precision: {prescision}</div>
                       ) : (
                         <div />
                       )}
@@ -732,8 +742,9 @@ const Home = () => {
                       <br />
 
                       <div>
-                        amount:{" "}
-                        <input
+                        Amount:{" "}
+                      <Input border="1px solid black"
+
                           type="text"
                           name="amount"
                           value={amount}
@@ -742,8 +753,9 @@ const Home = () => {
                       </div>
                       <br />
                       <div>
-                        address:{" "}
-                        <input
+                        Address:{" "}
+                        <Input border="1px solid black"
+                        
                           type="text"
                           name="address"
                           value={toAddress}
@@ -763,7 +775,7 @@ const Home = () => {
                         )}
                         <br />
                         contract:{" "}
-                        <input
+<Input border="1px solid black"
                           type="text"
                           name="contract"
                           value={contract}
@@ -772,7 +784,7 @@ const Home = () => {
                         <br />
                         <br />
                         tokenId:{" "}
-                        <input
+<Input border="1px solid black"
                           type="text"
                           name="tokenId"
                           value={tokenId}
@@ -782,7 +794,7 @@ const Home = () => {
                         <br />
                         <div>
                           address:{" "}
-                          <input
+  <Input border="1px solid black"
                             type="text"
                             name="address"
                             value={toAddress}
@@ -836,8 +848,8 @@ const Home = () => {
                 ) : (
                   <div />
                 )}
-                <Button colorScheme="blue" mr={3} onClick={handleClose}>
-                  exit
+                <Button colorScheme="red" mr={3} onClick={handleClose}>
+                  close
                 </Button>
               </ModalFooter>
             </div>
@@ -846,34 +858,55 @@ const Home = () => {
       </Modal>
       {address ? (
         <Box textAlign="center" fontSize="xl">
-          <Grid minH="100vh" p={3}>
-            <VStack spacing={8}>
-              <Logo h="40vmin" pointerEvents="none" logo={icon} />
-              <Grid templateRows="1fr 1fr 1fr" gap="1rem" alignItems="center">
-                <Box p="1rem" border="1px" borderColor="gray.300">
-                  <Text fontSize="xl" fontWeight="bold">
-                    Selected: {blockchain} (chainId{chainId})
-                  </Text>
-                  <Select
-                    placeholder={`selected: ${blockchain}`}
-                    defaultValue="ethereum"
-                    onChange={handleSelect}
-                  >
-                    {ALL_CHAINS.map((blockchain) => (
-                      <option value={blockchain.name}>
-                        {blockchain.name} ({blockchain.symbol})
-                      </option>
-                    ))}
-                  </Select>
+          <Grid minH="10vh" p={1}>
+            <VStack spacing={2}>
+              <Grid templateRows="1fr 1fr 0fr" gap="0rem" alignItems="center">
+              <Box
+        borderRadius="10px"
+        border="1px"
+        borderColor="black"
+
+        display="flex"
+        alignItems="center"
+      >
+        {/* Logo */}
+        <Logo padding="20px" h="20vmin" pointerEvents="none" logo={icon} />
+
+        {/* Centered Box for the first selection box */}
+        <Box flex="1">
+
+
+          <Select
+            placeholder={`Choose Blockchain`}
+            defaultValue="ethereum"
+            onChange={handleSelect}
+            maxWidth="80%"
+            marginLeft="40px"
+            borderColor="black"
+          >
+            {ALL_CHAINS.map((blockchain) => (
+              <option key={blockchain.name} value={blockchain.name}>
+                {blockchain.name} ({blockchain.symbol})
+              </option>
+            ))}
+          </Select>
+        </Box>
+      </Box>
+                  <Box borderRadius="10px" p="1rem" border="1px" borderColor="black">
+                    <Text fontWeight="bold" color="black"> Address </Text>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <CopyToClipboard text={address}>
+                        <span onClick={handleAddressClick} style={{ cursor: 'pointer' }}>{address}</span>
+                      </CopyToClipboard>
+                      <FontAwesomeIcon icon={faCopy} onClick={handleAddressClick} style={{ cursor: 'pointer', marginLeft: '0.5rem' }} />
+                    </div>
+                  </Box>
+                <Box borderRadius="10px"  border="1px" borderColor="black">
+                  <Text fontWeight="bold" color="black">Balance: </Text>
+                  <Text>{balance}</Text>
                 </Box>
-                <Box p="1rem" border="1px" borderColor="gray.300">
-                  <Text>address: {address}</Text>
-                </Box>
-                <Box p="1rem" border="1px" borderColor="gray.300">
-                  <Text>balance: {balance}</Text>
-                </Box>
-                <Box p="1rem" border="1px" borderColor="gray.300">
-                  <Button colorScheme="green" onClick={onOpen}>
+                <Box margin="10px" borderRadius="10px"  >
+                  <Button border="1px solid black" color="black" onClick={onOpen}>
                     Send
                   </Button>
                 </Box>
@@ -882,7 +915,7 @@ const Home = () => {
           </Grid>
         </Box>
       ) : (
-        // Spinner to show while loading address
+      <center>
         <Spinner
           size="xl"
           thickness="4px"
@@ -890,6 +923,7 @@ const Home = () => {
           emptyColor="gray.200"
           color="green.500"
         />
+        </center>
       )}
     </div>
   );
