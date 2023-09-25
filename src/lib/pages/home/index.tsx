@@ -1,4 +1,5 @@
 import {
+  keyframes,
   Stack,
   CardBody,
   Card,
@@ -662,7 +663,17 @@ const Home = () => {
     console.log("selectedContext: ", selectedContext);
     setSelectedWallet(selectedContext);
   };
-
+  const growShrinkAnimation = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
   // @ts-ignore
   return (
     <div>
@@ -903,26 +914,35 @@ const Home = () => {
                   </Box>
                 <Box borderRadius="10px"  border="1px" borderColor="black">
                   <Text fontWeight="bold" color="black">Balance: </Text>
-                  <Text>{balance}</Text>
+                  <Text>{parseFloat(balance).toFixed(6)}</Text>
                 </Box>
-                <Box margin="10px" borderRadius="10px"  >
-                  <Button border="1px solid black" color="black" onClick={onOpen}>
-                    Send
-                  </Button>
-                </Box>
+                <Box margin="10px" borderRadius="10px">
+  <Button
+    border="2px solid black"
+    color="black"
+    onClick={onOpen}
+    size="lg"
+  >
+    Send
+  </Button>
+</Box>
+
               </Grid>
             </VStack>
           </Grid>
         </Box>
       ) : (
       <center>
-        <Spinner
-          size="xl"
-          thickness="4px"
-          speed="0.65s"
-          emptyColor="gray.200"
-          color="green.500"
-        />
+        <Image         animation={`${growShrinkAnimation} 1s infinite`}
+ boxSize="48px" src="https://hackernoon.com/images/PrB8ElNwFUY9FJD7Kw2aUJtm1UW2-qul02i16.gif" ></Image>
+      <Text
+        fontSize="xl"
+        fontWeight="bold"
+        color="black"
+        animation={`${growShrinkAnimation} 1s infinite`}
+      >
+        Connect your wallet
+      </Text>
         </center>
       )}
     </div>
